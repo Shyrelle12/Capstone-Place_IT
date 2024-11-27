@@ -5,12 +5,11 @@
             {{ __('Payment Management') }}
         </h2>
     </x-slot>
-    <div class="container mx-auto mt-5">
-        <div class="bg-white shadow-md rounded-lg">
+    <div class="container mx-auto mt-5 p-5">
+        <div class="p-3 bg-white shadow-md rounded-lg">
             <div class="bg-primary text-black font-black text-lg p-4 rounded-t-lg text-center">
-                <h3>Payment Status Management</h3>
-            </div>
-            <div class="p-6">
+                <h3 class="text-lg font-semibold mb-4">Payment Status Management</h3>
+                <div class="mb-8 overflow-x-auto rounded-lg">
                 <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <thead>
                         <tr class="bg-orange-400 text-black uppercase text-sm leading-normal">
@@ -96,7 +95,9 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
+                </div>
+                </div>
+           
         </div>
     </div>
 

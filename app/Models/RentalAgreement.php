@@ -25,13 +25,18 @@ class RentalAgreement extends Model
     'status',
     'isPaid',
     ];
+    protected $casts = [
+        'dateStart' => 'datetime',  // Ensure these are cast to Carbon instances
+        'dateEnd' => 'datetime',
+    ];
 
     public function listing() {
         return $this->belongsTo(Listing::class, 'listingID');
     }
 
-    public function owner() {
-        return $this->belongsTo(User::class, 'ownerID');
+    public function spaceOwner()
+    {
+        return $this->belongsTo(User::class, 'ownerID', 'userID');
     }
     public function reviews()
     {

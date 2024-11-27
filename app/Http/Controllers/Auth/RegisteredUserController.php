@@ -55,7 +55,7 @@ class RegisteredUserController extends Controller
         session(['show_welcome_modal' => true]);
 
 
-        return redirect()->route('otp.verify')->with('status', 'Please check your email for the OTP.');
+        return redirect()->route('otp.verify');
     }
 
     /**
@@ -76,7 +76,7 @@ class RegisteredUserController extends Controller
         // Set session flag for showing welcome modal
         session(['show_welcome_modal' => true]);
 
-        return redirect()->route('otp.verify')->with('status', 'Please check your email for the OTP.');
+        return redirect()->route('otp.verify');
     }
 
     /**
@@ -88,8 +88,16 @@ class RegisteredUserController extends Controller
             'firstName' => ['required', 'string', 'max:255'],
             'lastName' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'mobileNumber' => ['required', 'string', 'max:20', 'unique:users'],
+            'mobileNumber' => [
+                'required',
+                'string',
+                'max:20', // Maximum length can remain
+                'regex:/^0[0-9]{10}$/', // Starts with 0, followed by 10 digits (total 11 digits)
+                'unique:users'
+            ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
     }
+
+
 }

@@ -83,7 +83,7 @@ class AdminController extends Controller
             $listing->status = 'Vacant';
             $listing->approvedBy_userID = Auth::id();
             $listing->save();
-            $this->notifySpaceOwner($listing);
+            $this->notifySpaceOwnerApprove($listing);
         }
     
         // Redirect back to the listing management page with success message
@@ -96,7 +96,7 @@ class AdminController extends Controller
             $listing->status = 'Disapproved';
             $listing->approvedBy_userID = Auth::id();
             $listing->save();
-            $this->notifySpaceOwner($listing);
+            $this->notifySpaceOwnerDisapprove($listing);
         }
     
         return redirect()->route('admin.listingmanagement')->with('success', 'Listing disapproved!');
@@ -129,12 +129,28 @@ class AdminController extends Controller
     {
         // Find the payment by ID
         $payment = Payment::find($paymentID);
+
+        if (!$payment) {
+            return redirect()->back()->with('error', 'Payment not found.');
+        }
         
         // Update the status based on form input
         $payment->status = $request->input('status');
         
         // Save the updated payment
         $payment->save();
+
+        if ($payment->status === 'confirmed') {
+            // Find the related RentalAgreement
+            $rentalAgreement = $payment->rentalAgreement;
+    
+            if ($rentalAgreement) {
+                // Update the isPaid field to true (1)
+                $rentalAgreement->isPaid = true; // Or $rentalAgreement->isPaid = 1;
+                $rentalAgreement->save();
+            }
+        }
+        
         $this->notifyOwnerPayment($payment);
         $this->notifyBusinessOwnerPayment($payment);
 
@@ -159,7 +175,22 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Payment transferred successfully!');
     }
 
-    protected function notifySpaceOwner(Listing $listing)
+    protected function notifySpaceOwnerApprove(Listing $listing)
+    {
+    // Find the space owner based on the ownerID in the Listing model
+    $spaceOwner = User::find($listing->ownerID);  // Assuming ownerID is the space owner's user ID
+
+    // Check if the space owner exists
+    if ($spaceOwner) {
+        // Create the notification for the space owner
+        Notification::create([
+            'n_userID' => $spaceOwner->userID,  // The space owner's user ID
+            'data' => $listing->title,  // Store the title in the notification's data field as JSON
+            'type' => 'listing_approved',  // Notification type
+            ]);
+        }
+    }
+    protected function notifySpaceOwnerDisapprove(Listing $listing)
     {
     // Find the space owner based on the ownerID in the Listing model
     $spaceOwner = User::find($listing->ownerID);  // Assuming ownerID is the space owner's user ID
@@ -221,7 +252,7 @@ class AdminController extends Controller
         // Create the notification for the space owner
         Notification::create([
             'n_userID' => $spaceOwner->userID,  // The space owner's user ID
-            'data' => 'You have received a payment sent by admin, check your credentials.',  // Store the title in the notification's data field as JSON
+            'data' => 'You have received a payment sent by admin, check your GCash.',  // Store the title in the notification's data field as JSON
             'type' => 'payment_sent',  // Notification type
             ]);
         }
@@ -283,10 +314,18 @@ class AdminController extends Controller
             // Send an email notification to the user
             Mail::to($user->email)->send(new AccountDeactivation($user->firstName, $user->reason));
 
-            return redirect()->back()->with('status', 'User deactivated successfully!');
+            return redirect()->back()->with('success', 'User deactivated successfully!');
         } else {
             return redirect()->back()->withErrors(['error' => 'User not found!']);
         }
     }
+    public function getUsersByRole($role)
+    {
+        if (!in_array($role, ['business_owner', 'space_owner'])) {
+            return response()->json([], 400); // Invalid role
+        }
 
+        $users = User::where('role', $role)->get(['userID', 'firstName', 'lastName']);
+        return response()->json($users);
+    }
 }

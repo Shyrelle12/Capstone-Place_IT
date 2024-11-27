@@ -31,7 +31,7 @@
         @endif
 
         <!-- OTP Verification Form -->
-        <form method="POST" action="{{ route('otp.verify.submit') }}" class="mb-6">
+        <form method="POST" action="{{ route('otp.verify.submit') }}" class="mb-3">
             @csrf
             <label for="otp" class="block text-sm font-medium text-gray-600 mb-2">Enter OTP</label>
             <input 
@@ -44,14 +44,14 @@
             >
             <button 
                 type="submit" 
-                class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                class="w-full mt-4 bg-red-500 hover:bg-red-700 text-white font-semibold py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
             >
                 Verify OTP
             </button>
         </form>
 
         <!-- Send OTP Button -->
-        <form method="POST" action="{{ route('email.send') }}" class="mb-6">
+        <form method="POST" action="{{ route('email.send') }}" class="mb-3">
             @csrf
             <button 
                 type="submit" 

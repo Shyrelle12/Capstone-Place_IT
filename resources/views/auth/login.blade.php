@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ asset('storage/images/placeholder.png') }}" type="image/png">
     <title>Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-nmkRI2k3l2GKtWo8ZxLpW2VfZHRlXYWnPbm2LFl9hAL5ZtntF7D1h6jcNcdEHOo5AC5f5E3i6fq4+Qkv3DdOdw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    
     @vite(['resources/css/app.css', 'resources/js/app.js']) <!-- Ensure Tailwind is loaded -->
 </head>
 <x-guest-layout>
@@ -64,6 +63,34 @@
 
             // Toggle the text between Show and Hide
             togglePassword.textContent = type === 'password' ? 'Show' : 'Hide';
+        });
+
+        // Autofill credentials if remember token exists
+        document.addEventListener('DOMContentLoaded', function () {
+            if (localStorage.getItem('rememberMe') === 'true') {
+                const email = localStorage.getItem('email');
+                const password = localStorage.getItem('password');
+                if (email && password) {
+                    document.getElementById('email').value = email;
+                    document.getElementById('password').value = password;
+                    document.getElementById('remember_me').checked = true;
+                }
+            }
+        });
+
+        // Optionally store the user's credentials locally when they choose to remember them
+        document.getElementById('remember_me').addEventListener('change', function () {
+            if (this.checked) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                localStorage.setItem('rememberMe', 'true');
+                localStorage.setItem('email', email);
+                localStorage.setItem('password', password);
+            } else {
+                localStorage.removeItem('rememberMe');
+                localStorage.removeItem('email');
+                localStorage.removeItem('password');
+            }
         });
     </script>
 </x-guest-layout>

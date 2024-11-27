@@ -3,7 +3,7 @@
 <div id="welcomeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
     <div class="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div class="px-6 py-4 border-b">
-            <h5 class="text-4xl font-semibold text-orange-500 dark:text-white" id="welcomeModalLabel">Welcome to PlaceIt</h5>
+            <h5 class="text-4xl font-semibold text-orange-500" id="welcomeModalLabel">Welcome to PlaceIt</h5>
             <button type="button" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900" onclick="toggleModal()">
                 &times;
             </button>

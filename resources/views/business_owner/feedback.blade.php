@@ -84,84 +84,70 @@
         </h2>
     </x-slot>
 
-    <div class="w-full py-6 flex justify-center">
-        <div class="max-w-7xl mx-auto sm:px-7 lg:px-9"> <!-- Increased max-width to fit all items -->
-            <div class="bg-white p-12 shadow-xl sm:rounded-2xl border border-gray-200 feedback-container">
+    <div class="w-full py-6 flex justify-center px-4 sm:px-0">
+        <div class="max-w-2xl w-full">
+            <div class="bg-white p-6 sm:p-12 shadow-xl rounded-2xl feedback-container">
                 
                 <!-- Feedback Title -->
-                <div class="text-center mb-8 container-header fade-in">
-                    <h3 class="text-2xl font-semibold text-gray-800">Submit Feedback</h3>
-                    <p class="text-gray-600 mt-2">Summarize your experience with the Space Owner</p>
+                <div class="text-center mb-6 sm:mb-8 container-header fade-in">
+                    <h3 class="text-xl sm:text-2xl font-semibold text-gray-800">Submit Feedback</h3>
+                    <p class="text-gray-600 mt-2 text-sm sm:text-base">Summarize your experience with the Space Owner</p>
                 </div>
 
-                <!-- Feedback Experience Section -->
-                <form action="{{ route('business.submit') }}" method="POST" class="mt-6 space-y-6">
+                <!-- Feedback Form -->
+                <form action="{{ route('business.submit') }}" method="POST" class="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
                     @csrf
 
-                    <!-- Rating -->
+                    <!-- Rating Section -->
                     <div class="text-center">
-                        <h4 class="text-lg font-semibold text-gray-700">How was your experience?</h4>
-                        <p class="text-sm text-gray-500 mb-6">Click an emoji to rate us!</p>
-                        <div class="flex justify-center space-x-8"> <!-- Centered emojis -->
-                            <label class="flex flex-col items-center cursor-pointer">
-                                <input type="radio" name="rate" value="1" class="hidden rate-input" required>
-                                <span class="text-4xl rate-emoji" data-value="1">😡</span>
-                                <span class="text-yellow-500 text-sm mt-2">⭐</span>
-                            </label>
-                            <label class="flex flex-col items-center cursor-pointer">
-                                <input type="radio" name="rate" value="2" class="hidden rate-input" required>
-                                <span class="text-4xl rate-emoji" data-value="2">😞</span>
-                                <span class="text-yellow-500 text-sm mt-2">⭐⭐</span>
-                            </label>
-                            <label class="flex flex-col items-center cursor-pointer">
-                                <input type="radio" name="rate" value="3" class="hidden rate-input" required>
-                                <span class="text-4xl rate-emoji" data-value="3">😐</span>
-                                <span class="text-yellow-500 text-sm mt-2">⭐⭐⭐</span>
-                            </label>
-                            <label class="flex flex-col items-center cursor-pointer">
-                                <input type="radio" name="rate" value="4" class="hidden rate-input" required>
-                                <span class="text-4xl rate-emoji" data-value="4">😀</span>
-                                <span class="text-yellow-500 text-sm mt-2">⭐⭐⭐⭐</span>
-                            </label>
-                            <label class="flex flex-col items-center cursor-pointer">
-                                <input type="radio" name="rate" value="5" class="hidden rate-input" required>
-                                <span class="text-4xl rate-emoji" data-value="5">😊</span>
-                                <span class="text-yellow-500 text-sm mt-2">⭐⭐⭐⭐⭐</span>
-                            </label>
+                        <h4 class="text-lg sm:text-xl font-semibold text-gray-700">How was your experience?</h4>
+                        <p class="text-sm text-gray-500 mb-4 sm:mb-6">Click an emoji to rate us!</p>
+                        <div class="flex justify-center flex-wrap gap-4 sm:gap-8">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <label class="flex flex-col items-center cursor-pointer">
+                                    <input type="radio" name="rate" value="{{ $i }}" class="hidden rate-input" required>
+                                    <span class="text-3xl sm:text-4xl rate-emoji" data-value="{{ $i }}">
+                                        @if ($i == 1) 😡 @elseif ($i == 2) 😞 @elseif ($i == 3) 😐 @elseif ($i == 4) 😀 @else 😊 @endif
+                                    </span>
+                                    <span class="text-yellow-500 text-xs sm:text-sm mt-1 sm:mt-2">{{ str_repeat('⭐', $i) }}</span>
+                                </label>
+                            @endfor
                         </div>
                     </div>
 
-                    <!-- Feedback Section -->
-                    <div class="text-center mt-6">
-                        <h4 class="text-lg font-semibold text-gray-700">Leave your feedback</h4>
-                        <p class="text-sm text-gray-500 mb-6">We'd love to hear your thoughts!</p>
+                    <!-- Feedback Text Section -->
+                    <div class="text-center mt-4 sm:mt-6">
+                        <h4 class="text-lg sm:text-xl font-semibold text-gray-700">Leave your feedback</h4>
+                        <p class="text-sm text-gray-500 mb-4 sm:mb-6">We'd love to hear your thoughts!</p>
                     </div>
 
-                    <!-- Hidden Renter ID -->
+                    <!-- Hidden Inputs -->
                     <input type="hidden" name="renterID" value="{{ auth()->id() }}">
                     <input type="hidden" name="rentalAgreementID" value="{{ $rentalAgreement->rentalAgreementID }}">
 
                     <!-- Feedback Textarea -->
-                    <div class="mb-6">
-                        <textarea name="comment" rows="4" class="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="Leave your feedback here..." required></textarea>
+                    <div class="mb-4 sm:mb-6">
+                        <textarea name="comment" rows="4" class="w-full p-3 sm:p-4 border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm sm:text-base" placeholder="Leave your feedback here..." required></textarea>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="text-center">
-                        <button type="submit" class="bg-orange-500 text-white py-3 px-8 rounded-2xl submit-btn hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400">Submit</button>
+                        <button type="submit" class="bg-orange-500 text-white py-2 px-6 sm:py-3 sm:px-8 rounded-lg sm:rounded-2xl submit-btn hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                            Submit
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript to handle emoji click and update radio button -->
+    <!-- JavaScript to handle emoji click -->
     <script>
         document.querySelectorAll('.rate-emoji').forEach(emoji => {
             emoji.addEventListener('click', function() {
                 // Remove 'selected' class from all emojis
                 document.querySelectorAll('.rate-emoji').forEach(e => e.classList.remove('selected'));
-                
+
                 // Add 'selected' class to the clicked emoji
                 this.classList.add('selected');
 

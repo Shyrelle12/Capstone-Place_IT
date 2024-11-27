@@ -45,9 +45,15 @@ class LoginRequest extends FormRequest
         $user = Auth::getProvider()->retrieveByCredentials($this->only('email', 'password'));
 
         if (! $user || ! $user->isActive) {
-            throw ValidationException::withMessages([
-                'email' => 'Your account has been deactivated. Please contact the administrator.',
-            ]);
+            $messages = [];
+        
+            if (! $user) {
+                $messages['email'] = 'This account does not exist or has been deleted. Please contact the administrator.';
+            } elseif (! $user->isActive) {
+                $messages['email'] = 'Your account has been deactivated. Please contact the administrator.';
+            }
+        
+            throw ValidationException::withMessages($messages);
         }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
@@ -61,7 +67,7 @@ class LoginRequest extends FormRequest
         RateLimiter::clear($this->throttleKey());
     }
 
-
+    
     /**
      * Ensure the login request is not rate limited.
      *

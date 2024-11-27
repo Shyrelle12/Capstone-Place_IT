@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id('billingDetailID'); 
             $table->unsignedBigInteger('user_id'); // Foreign key for users
             $table->unsignedBigInteger('rental_agreement_id'); // Foreign key for rental agreements
-            $table->string('gcash_number')->unique(); // GCash number field
+            $table->string('gcash_number'); // GCash number field
             $table->timestamps();
 
             // Foreign key constraints

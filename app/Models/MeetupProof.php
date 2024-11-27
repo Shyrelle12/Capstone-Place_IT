@@ -17,6 +17,6 @@ class MeetupProof extends Model
 
     public function rentalAgreement()
     {
-        return $this->belongsTo(RentalAgreement::class);
+        return $this->belongsTo(RentalAgreement::class,'rental_agreement_id', 'rentalAgreementID');
     }
 }

@@ -12,7 +12,7 @@ use App\Http\Controllers\CreateListingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Auth\EmailVerifyController;
+use App\Http\Controllers\SystemFeedbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +78,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     // Add new admin
     Route::get('/admin/usermanagement/admins/add', [AdminController::class, 'create'])->name('admin.create');
     Route::post('/admin/usermanagement/admins', [AdminController::class, 'store'])->name('admin.store');
+
+    Route::get('/admin/dashboard/{role}', [AdminController::class, 'getUsersByRole']);
 });
 
 // Admin Listings
@@ -135,8 +137,8 @@ Route::middleware(['auth', 'verified', 'role:space_owner'])->group(function () {
     Route::post('/spaces/{listingID}/add_image', [  SpaceOwnerController::class, 'addImage'])->name('space_owner.add_image');
     Route::get('/space/negotiations', [NegotiationController::class, 'index'])->name('space.negotiations');
     Route::get('/space/negotiations/{negotiationID}', [NegotiationController::class, 'show'])->name('space.negotiation.show');
-    Route::get('/space/reviews', [SpaceOwnerController::class, 'reviews'])->name('space.reviews');
-    Route::post('/space/reviews.submit', [SpaceOwnerController::class, 'submit'])->name('space.submit');
+    Route::get('/space/reviews', [SystemFeedbackController::class, 'index'])->name('space.reviews');
+    Route::post('/space/reviews/submit', [SystemFeedbackController::class, 'store'])->name('space.submit');
     Route::get('/space/payment', [NegotiationController::class, 'showPaymentDetails'])->name('space.business_details');
     Route::put('/space/payment/{payment}/approve', [NegotiationController::class, 'approve'])->name('payments.approve');
     Route::post('space/rentalagreement/{rentalAgreementID}/approve', [NegotiationController::class, 'approveRentalAgreement'])->name('rentalagreement.approve');
@@ -156,6 +158,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotifications'])->name('notifications.all');
     Route::get('/space/notifications/unread', [NotificationController::class, 'getUnreadNotifications'])->name('notifications.unread');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Send Email for Verification

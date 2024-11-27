@@ -10,7 +10,7 @@
                             <input class="bg-gray-50 pl-10 pr-10 py-2 w-full rounded-xl border border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" 
                                    type="text" 
                                    name="search" 
-                                   placeholder="Type places or spaces.."
+                                   placeholder="Type a city.."
                                    value="{{ request('search') }}">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
                             <button type="submit" class="hidden">Search</button>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\FollowUp;
 
 class NotificationController extends Controller
 {
@@ -14,33 +16,62 @@ class NotificationController extends Controller
     }
     public function store(Request $request)
     {
-        // Validate the request data
+        //dd($request->all());
         $request->validate([
             'type' => 'required|string|max:255',
             'message' => 'required|string|max:255',
-            'selectUser' => 'required|string' // Add validation for the new field
+            'selectUser' => 'required|string',
+            'user_id' => 'nullable|exists:users,userID',
         ]);
 
-        // Determine the role based on the selected user type
-        $role = $request->selectUser === 'space_owner' ? 'space_owner' : 'business_owner';
-
-        // Retrieve all users except admins
-        $users = User::where('role', $role)->get(); 
-
-        // Loop through each user and create a notification entry for them
-        foreach ($users as $user) {
+        // Determine the user roles to notify based on the selection
+        if ($request->filled('user_id')) {
+            // Create a notification for the selected user
+            $user = User::findOrFail($request->user_id);
+    
             Notification::create([
-                'n_userID' => $user->userID,  // Ensure the n_userID references the users table
-                'type' => $request->type,  // You can put additional data here if needed
+                'n_userID' => $user->userID,
+                'type' => $request->type,
                 'data' => $request->message,
                 'created_at' => now(),
             ]);
+    
+            // Send email if notification type is follow-up
+            if ($request->type === 'follow-up') {
+                Mail::to($user->email)->send(new FollowUp);
+            }
+        } else {
+            // Notify users based on roles if no specific user is selected
+            $roles = [];
+            if ($request->selectUser === 'space_owner') {
+                $roles[] = 'space_owner';
+            } elseif ($request->selectUser === 'business_owner') {
+                $roles[] = 'business_owner';
+            } elseif ($request->selectUser === 'both') {
+                $roles = ['space_owner', 'business_owner'];
+            }
+    
+            // Retrieve all users with the selected roles
+            $users = User::whereIn('role', $roles)->get();
+    
+            // Loop through each user and create a notification entry for them
+            foreach ($users as $user) {
+                Notification::create([
+                    'n_userID' => $user->userID,
+                    'type' => $request->type,
+                    'data' => $request->message,
+                    'created_at' => now(),
+                ]);
+    
+                // Send email if notification type is follow-up
+                if ($request->type === 'follow-up') {
+                    Mail::to($user->email)->send(new FollowUp);
+                }
+            }
         }
-
-        // Redirect back with a success message
+    
         return redirect()->route('admin.dashboard')->with('success', 'Notification sent successfully!');
     }
-
     // Mark a notification as read
     public function markAsRead($id)
     {
@@ -61,11 +92,21 @@ class NotificationController extends Controller
 
         // Retrieve notifications with offset
         $notifications = Notification::where('n_userID', auth()->id())
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->skip($offset)
             ->take($limit)
             ->get();
 
         return response()->json($notifications);
     }
+    public function destroy($id)
+    {
+        $notification = Notification::find($id);
+        if ($notification) {
+            $notification->delete();
+            return response()->json(['message' => 'Notification deleted successfully.']);
+        }
+        return response()->json(['message' => 'Notification not found.'], 404);
+    }
+
 }

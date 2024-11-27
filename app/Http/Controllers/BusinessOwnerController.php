@@ -21,24 +21,24 @@ class BusinessOwnerController extends Controller
      * @return \Illuminate\View\View
      */
     public function index()
-{
-    // Define the locations you want to filter
-    $locations = ['Cebu City', 'Mandaue City', 'Talisay City', 'Lapu-Lapu City', 'Naga City', 'Minglanilla City', 'Toledo City', 'Carcar', 'Asturias', 'Dumanjug', 'Barili', 'Danao'];
-    
-    // Initialize an array to store the counts
-    $listingsCount = [];
+    {
+            // Define the locations you want to filter
+            $locations = ['Cebu City', 'Mandaue City', 'Talisay City', 'Lapu-Lapu City', 'Naga City', 'Minglanilla City', 'Toledo City', 'Carcar', 'Asturias', 'Dumanjug', 'Barili', 'Danao'];
+            
+            // Initialize an array to store the counts
+            $listingsCount = [];
 
-    // Loop through the locations and get the count for each
-    foreach ($locations as $location) {
-        // Count listings for the current location, excluding Pending and Deactivated statuses
-        $listingsCount[$location] = Listing::where('location', 'LIKE', '%' . $location . '%')
-                                            ->whereNotIn('status', ['Deactivated', 'Pending', 'Disapproved'])
-                                            ->count();
+            // Loop through the locations and get the count for each
+            foreach ($locations as $location) {
+                // Count listings for the current location, excluding Pending and Deactivated statuses
+                $listingsCount[$location] = Listing::where('location', 'LIKE', '%' . $location . '%')
+                                                    ->whereNotIn('status', ['Deactivated', 'Pending', 'Disapproved'])
+                                                    ->count();
+            }
+
+        // Return the count to the view
+        return view('dashboard.business', compact('listingsCount'));
     }
-
-    // Return the count to the view
-    return view('dashboard.business', compact('listingsCount'));
-}
 
 
     public function showByLocation($location)
@@ -76,14 +76,7 @@ class BusinessOwnerController extends Controller
             'details' => $request->details ?? '',
             'status' => 'pending',
         ]);
-
-        $rentalAgreement = RentalAgreement::where('rentalAgreementID', $negotiationID)->first();
     
-        if ($rentalAgreement) {
-            $rentalAgreement->isPaid = true; // Mark as paid
-            $rentalAgreement->save(); // Save the changes
-        }
-
         $this->notifyAdminPayment($payment);
 
         // Redirect back with a success message
@@ -105,10 +98,11 @@ class BusinessOwnerController extends Controller
     }
     public function bookinghistory()
     {
-        $bhistory = History::with(['rentalAgreement.space', 'rentalAgreement.owner'])
-                           ->where('renterID', auth()->id())
-                           ->orderBy('date','desc')
-                           ->get();
+        $bhistory = Payment::with(['rentalAgreement.listing', 'rentalAgreement.spaceOwner'])  // Change 'spaceOwner' to 'owner' (for the space owner)
+            ->where('renterID', auth()->id())
+            ->where('status', 'received')  // Filter payments that have been received
+            ->orderBy('date', 'desc')  // Order by the payment date in descending order
+            ->get();
         
         return view('business_owner.bookinghistory', compact('bhistory'));
     }

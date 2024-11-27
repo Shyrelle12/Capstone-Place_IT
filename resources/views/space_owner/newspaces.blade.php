@@ -73,12 +73,12 @@
                 const listItem = document.createElement('li');
                 listItem.className = 'flex justify-between items-center';
 
-                listItem.innerHTML = `
+                listItem.innerHTML = 
                     <span>${file.name}</span>
                     <button onclick="removeFile(${index})" class="text-red-500 ml-2 hover:text-red-700">
                         Remove
                     </button>
-                `;
+                ;
                 
                 fileList.appendChild(listItem);
             });

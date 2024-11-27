@@ -23,14 +23,14 @@
             <!-- First Name -->
             <div>
                 <x-input-label for="firstName" :value="__('First Name')" />
-                <x-text-input id="firstName" class="block mt-1 w-full" type="text" name="firstName" :value="old('firstName')" required autofocus autocomplete="given-name" />
+                <x-text-input id="firstName" class="block mt-1 w-full" type="text" placeholder="Henry" name="firstName" :value="old('firstName')" required autofocus autocomplete="given-name" />
                 <x-input-error :messages="$errors->get('firstName')" class="mt-2" />
             </div>
 
             <!-- Last Name -->
             <div>
                 <x-input-label for="lastName" :value="__('Last Name')" />
-                <x-text-input id="lastName" class="block mt-1 w-full" type="text" name="lastName" :value="old('lastName')" required autocomplete="family-name" />
+                <x-text-input id="lastName" class="block mt-1 w-full" type="text" placeholder="Sy" name="lastName" :value="old('lastName')" required autocomplete="family-name" />
                 <x-input-error :messages="$errors->get('lastName')" class="mt-2" />
             </div>
         </div>
@@ -39,14 +39,14 @@
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="email" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" placeholder="henrysy@email.com" name="email" :value="old('email')" required autocomplete="email" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Mobile Number -->
         <div class="mt-4">
             <x-input-label for="mobileNumber" :value="__('Mobile Number')" />
-            <x-text-input id="mobileNumber" class="block mt-1 w-full" type="text" name="mobileNumber" :value="old('mobileNumber')" required autocomplete="tel" />
+            <x-text-input id="mobileNumber" class="block mt-1 w-full" type="text" placeholder="09123456789" name="mobileNumber" :value="old('mobileNumber')" required autocomplete="tel" />
             <x-input-error :messages="$errors->get('mobileNumber')" class="mt-2" />
         </div>
 

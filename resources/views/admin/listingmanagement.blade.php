@@ -17,13 +17,13 @@
                     @if($pendingListings->isEmpty())
                         <p class="text-gray-500 py-2 pb-2">No pending listings for approval.</p>
                     @else
+                        <div class="mb-8 overflow-x-auto rounded-lg">
                         <table class="min-w-full table-auto mb-6 border-collapse" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th class="px-6 py-3 border w-1/4">Title</th>
                                     <th class="px-6 py-3 border w-1/4">Location</th>
                                     <th class="px-6 py-3 border w-1/4">Owner</th>
-                                    <th class="px-6 py-3 border w-1/4">Status</th>
                                     <th class="px-6 py-3 border w-1/4">Action</th>
                                 </tr>
                             </thead>
@@ -33,7 +33,6 @@
                                         <td class="border px-6 py-3">{{ $listing->title }}</td>
                                         <td class="border px-6 py-3">{{ $listing->location }}</td>
                                         <td class="border px-6 py-3">{{ $listing->owner->firstName }} {{ $listing->owner->lastName }}</td>
-                                        <td class="border px-6 py-3">{{ ucfirst($listing->status) }}</td>
                                         <td class="border px-6 py-3">
                                             <div class="flex space-x-2">
                                                 <form method="POST" action="{{ route('admin.approveListing', $listing->listingID) }}">
@@ -57,6 +56,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     @endif
 
                     <!-- All Listings Section -->
@@ -65,6 +65,7 @@
                     @if($allListings->isEmpty())
                         <p class="text-gray-500">No listings available.</p>
                     @else
+                        <div class="mb-8 overflow-x-auto rounded-lg">
                         <table class="min-w-full table-auto border-collapse" style="width: 100%;">
                             <thead>
                                 <tr>
@@ -95,6 +96,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
                     @endif
 
                    <!-- Modal -->

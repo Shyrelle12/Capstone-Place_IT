@@ -29,7 +29,7 @@
         </p>
 
         <div class="mt-8 border-t border-gray-200 pt-6 text-sm text-gray-400">
-            <p>&copy; {{ date('Y') }} Your Company. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} PlaceIt. All rights reserved.</p>
         </div>
     </div>
 </body>

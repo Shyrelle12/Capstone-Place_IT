@@ -1,4 +1,3 @@
-<!-- resources/views/place/showByLocation.blade.php -->
 <title>Locations in {{ $location }}</title>
 <x-app-layout>
     <x-slot name="header">
@@ -9,34 +8,94 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if($listings->isEmpty())
-                <div class="bg-white shadow-sm sm:rounded-lg p-6 text-gray-500">
-                    No listings found for {{ $location }}.
-                </div>
-            @else
-                <div class="grid grid-cols-1 gap-4">
-                    @foreach($listings as $listing)
-                        <!-- Card wrapper that is now clickable -->
-                        <a href="{{ route('place.detail', ['listingID' => $listing->listingID]) }}" class="block border border-gray-200 rounded-lg shadow-lg p-4 
-                        bg-green-50 @if($loop->index % 3 == 0) bg-green-50 @elseif($loop->index % 3 == 1) bg-yellow-50 @else bg-yellow-100 @endif 
-                        hover:bg-gray-100">
-                            <div class="flex justify-between items-center">
-                                <div class="flex flex-col">
-                                    <h3 class="text-lg font-semibold text-blue-800 mb-1">{{ $listing->title }}</h3>
-                                    <p class="text-gray-700 text-sm mb-1">{{ $listing->location }}</p>
-                                    <p class="text-gray-700 text-sm mb-1">{{ $listing->description }}</p>
-                                </div>
-                                <div class="text-right pb-14">
-                                    <p class="text-black-700"><strong>Owner:</strong> {{ ucwords($listing->owner->firstName) }}</p>
-                                </div>
+            <!-- Skeleton Loader -->
+            <div id="loadingSkeleton" class="grid grid-cols-1 gap-2">
+                @for ($i = 0; $i < 5; $i++)
+                    <div class="block border border-gray-300 rounded-lg shadow-md p-4 bg-gray-200 animate-pulse">
+                        <div class="flex flex-col md:flex-row md:justify-between md:px-6">
+                            <!-- Title -->
+                            <div class="w-full md:w-1/4 text-left mb-2 md:mb-0 px-2">
+                                <div class="bg-gray-400 h-4 w-3/4 rounded"></div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-gray-700 text-sm mb-1">{{ $listing->dateCreated->format('Y-m-d') }}</p>
+                            <!-- Owner -->
+                            <div class="w-full md:w-1/4 text-left mb-2 md:mb-0 px-2">
+                                <div class="bg-gray-400 h-4 w-1/2 rounded"></div>
                             </div>
-                        </a> <!-- End of clickable card -->
-                    @endforeach
-                </div>
-            @endif
+                            <!-- Location -->
+                            <div class="w-full md:w-1/4 text-left mb-2 md:mb-0 px-2">
+                                <div class="bg-gray-400 h-4 w-1/2 rounded"></div>
+                            </div>
+                            <!-- Date -->
+                            <div class="w-full md:w-1/4 text-left px-2">
+                                <div class="bg-gray-400 h-4 w-1/3 rounded"></div>
+                            </div>
+                            <!-- Status -->
+                            <div class="w-full md:w-1/4 text-center px-2">
+                                <div class="bg-gray-400 h-4 w-1/4 mx-auto rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                @endfor
+            </div>
+
+            <!-- Actual Content -->
+            <div id="listingContainer" class="hidden">
+                @if($listings->isEmpty())
+                    <div class="bg-white shadow-sm sm:rounded-lg p-6 text-gray-500">
+                        No listings found for {{ $location }}.
+                    </div>
+                @else
+                    <!-- Label for the cards (hidden on mobile) -->
+                    <div class="hidden md:flex font-semibold text-gray-800 mb-4">
+                        <div class="w-1/4 text-left px-2">Title</div>
+                        <div class="w-1/4 text-left px-2">Owner</div>
+                        <div class="w-1/4 text-left px-2">Location</div>
+                        <div class="w-1/4 text-left px-2">Date Created</div>
+                        <div class="w-1/4 text-center px-2">Status</div>
+                    </div>
+
+                    <!-- Cards -->
+                    <div class="grid grid-cols-1 gap-2">
+                        @foreach($listings as $listing)
+                            <a href="{{ route('place.detail', ['listingID' => $listing->listingID]) }}" 
+                               class="block border border-gray-300 rounded-lg shadow-md p-4 bg-white hover:bg-gray-50">
+                                <div class="flex flex-col  md:flex-row md:justify-between md:px-6">
+                                    <!-- Description -->
+                                    <div class="w-full md:w-1/4 text-left mb-2 md:mb-0 px-2">
+                                        <p class="text-gray-800"><strong>{{ $listing->title }}</strong></p>
+                                    </div>
+                                    <!-- Owner -->
+                                    <div class="w-full md:w-1/4 text-left mb-2 md:mb-0 px-2">
+                                        <p class="text-gray-800">{{ ucwords($listing->owner->firstName) }}</p>
+                                    </div>
+                                    <!-- Location -->
+                                    <div class="w-full md:w-1/4 text-left mb-2 md:mb-0 px-2">
+                                        <p class="text-gray-800">{{ $listing->location }}</p>
+                                    </div>
+                                    <!-- Date -->
+                                    <div class="w-full md:w-1/4 text-left px-2">
+                                        <p class="text-gray-800">{{ $listing->dateCreated->format('F j, Y') }}</p>
+                                    </div>
+                                    <!-- Status -->
+                                    <div class="w-full md:w-1/4 text-center px-2">
+                                        <p class="text-gray-800">{{ $listing->status }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading with a timeout
+            setTimeout(() => {
+                document.getElementById('loadingSkeleton').classList.add('hidden'); // Hide skeleton
+                document.getElementById('listingContainer').classList.remove('hidden'); // Show actual content
+            }, 700); // Simulate 2 seconds of loading
+        });
+    </script>
 </x-app-layout>

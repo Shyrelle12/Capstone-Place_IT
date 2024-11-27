@@ -13,10 +13,11 @@
                 
                 <!-- GCash QR Code Section -->
                 <div class="text-center mb-4">
-                    <img src="{{ asset('storage/images/placeit.png') }}" alt="GCash Payment QR Code" class="w-96 h-64 mx-auto">
-                    <p class="text-lg text-sky-500 font-bold mt-2">PlaceIT</p>
+                    <img src="{{ asset('qr.png') }}" alt="GCash Payment QR Code" class="w-full max-w-xs h-auto mx-auto object-contain">
+                    <p class="text-lg text-sky-500 font-bold mt-2">Lemarc Eyac</p>
                     <p class="text-lg text-gray-400 font-semibold mt-2">+0922*****77</p> 
                 </div>
+
 
                 <!-- Payment Form -->
                 <form action="{{ route('businessOwner.storeProofOfPayment', ['negotiationID' => $negotiation->negotiationID]) }}" method="POST" enctype="multipart/form-data">

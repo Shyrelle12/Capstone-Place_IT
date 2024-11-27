@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Listing;
 use App\Models\ListingImages;
 use App\Models\Reviews;
+use App\Models\User;
+use App\Models\Notification;
 use App\Models\MeetUpProof;
 
 
@@ -33,16 +35,6 @@ class SpaceOwnerController extends Controller
     {
         $listings = Listing::where('ownerID', Auth::id())->get();
         return view('space_owner.negotiations', compact('listings'));
-    }
-    public function reviews()
-    {
-        // Fetch feedbacks from the reviews table, with related space title and renter details
-        $rentalAgreements = RentalAgreement::where('ownerID', auth()->user()->userID)->get();
-        $feedbacks = Reviews::with(['rentalAgreement.space', 'renter'])
-                    ->latest() // Order by the latest feedback
-                    ->get();
-
-        return view('space_owner.reviews', compact('feedbacks','rentalAgreements'));
     }
 
     public function edit($listingID)
@@ -162,12 +154,27 @@ class SpaceOwnerController extends Controller
         $path = $request->file('proofFile')->store('meetup_proofs', 'public');
 
         // Create a new MeetupProof entry
-        MeetupProof::create([
+        $meetup = MeetupProof::create([
             'rental_agreement_id' => $negotiationID,
             'proof_image' => $path,
             'status' => 'pending',
         ]);
 
+        $this->notifyAdminMeetup($meetup);
+
         return redirect()->back()->with('success', 'Proof of meetup sent successfully.');
+    }
+    protected function notifyAdminMeetup($meetup)
+    {
+    // Find the space owner based on the ownerID in the Listing model
+        $adminUsers = User::where('role', 'admin')->get(); // Adjust based on your role management
+
+        foreach ($adminUsers as $admin) {
+            Notification::create([
+                'n_userID' => $admin->userID,  // The space owner's user ID
+                'data' => $meetup->rentalAgreement->spaceOwner->firstName . ' ' . $meetup->rentalAgreement->spaceOwner->lastName,  // Store the title in the notification's data field as JSON
+                'type' => 'meetup_submitted',  // Notification type
+                ]);
+        }   
     }
 }

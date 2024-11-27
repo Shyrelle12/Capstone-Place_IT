@@ -20,11 +20,14 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
+            <!-- Check if the user is not a space_owner or business_owner before displaying delete option -->
+            @if(auth()->user()->role != 'business_owner' && auth()->user()->role != 'space_owner') <!-- Assuming role 1 = space_owner, role 2 = business_owner -->
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <div class="max-w-xl">
+                        @include('profile.partials.delete-user-form')
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

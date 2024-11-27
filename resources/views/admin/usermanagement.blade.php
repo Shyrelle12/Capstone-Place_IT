@@ -39,7 +39,7 @@
                                     <th class="py-2 px-4 border-b text-left">Last Name</th>
                                     <th class="py-2 px-4 border-b text-left">Email</th>
                                     <th class="py-2 px-4 border-b text-left">Verified</th>
-                                    <th class="py-2 px-4 border-b text-left">Status</th>
+                                    <th class="py-2 px-4 border-b text-left">Mobile Number</th>
                                     <th class="py-2 px-4 border-b text-left">Created At</th>
                                     <th class="py-2 px-4 border-b text-left">Actions</th>
                                 </tr>
@@ -52,16 +52,16 @@
                                         <td class="py-2 px-4 border-b">{{ ucwords($user->lastName) }}</td>
                                         <td class="py-2 px-4 border-b">{{ $user->email }}</td>
                                         <td class="py-2 px-4 border-b">{{ $user->isVerified ? 'Yes' : 'No' }}</td>
-                                        <td class="py-2 px-4 border-b">{{ $user->isActive ? 'Activated' : 'Deactivated' }}</td>
+                                        <td class="py-2 px-4 border-b">{{ $user->mobileNumber}}</td>
                                         <td class="py-2 px-4 border-b">{{ $user->created_at->format('Y-m-d') }}</td>
                                         <td class="py-2 px-4 border-b">
                                         @if($currentRole !== 'admin')
                                             @if($user->isActive)
-                                                <button onclick="showDeactivationModal('{{ $user->userID }}')" class="font-semibold border-2 border-red-500 bg-red-500 rounded-lg p-2 text-black hover:text-red-100">
+                                                <x-primary-button onclick="showDeactivationModal('{{ $user->userID }}')">
                                                     Deactivate
-                                                </button>
+                                                </x-primary-button>
                                             @else
-                                                <button onclick="showActivationModal('{{ $user->userID }}')" class="font-semibold border-2 bg-green-500 border-green-500 rounded-lg p-2 text-black hover:text-green-100">
+                                                <button onclick="showActivationModal('{{ $user->userID }}')" class="font-semibold border-2 bg-green-500 border-transparent ease-in-out duration-150 rounded-lg px-4 py-2 uppercase text-white text-xs hover:bg-green-700">
                                                     Activate
                                                 </button>
 

@@ -30,39 +30,46 @@ class Payment extends Model
 
     public function renter()
     {
-        return $this->belongsTo(User::class, 'renterID', 'userID'); // Adjust 'userID' if your primary key is different
+        return $this->belongsTo(User::class, 'renterID', 'userID');
     }
+
     public function sender()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'senderID', 'userID');
     }
+
     public function listing()
     {
-        return $this->belongsTo(Listing::class, 'rentalAgreementID', 'listingID'); // Adjust if necessary
+        return $this->belongsTo(RentalAgreement::class, 'rentalAgreementID', 'rentalAgreementID')->with('listing');
     }
-        public function rentalAgreement()
+
+    public function rentalAgreement()
     {
-        return $this->belongsTo(RentalAgreement::class, 'rentalAgreementID', 'rentalAgreementID'); // Adjust if necessary
+        return $this->belongsTo(RentalAgreement::class, 'rentalAgreementID', 'rentalAgreementID');
     }
+
     public function spaceOwner()
     {
         return $this->hasOneThrough(
-            User::class,  // The final model (User) you want to retrieve
-            RentalAgreement::class,  // The intermediary model (RentalAgreement) between Payment and User
-            'rentalAgreementID',  // Foreign key on the RentalAgreement table
-            'userID',  // Foreign key on the User table
-            'rentalAgreementID',  // Local key on the Payment table
-            'ownerID'  // Local key on the RentalAgreement table (make sure this is correctly named)
+            User::class,  // Final model (User) that you want to retrieve
+            RentalAgreement::class,  // Intermediary model (RentalAgreement) between Payment and User
+            'rentalAgreementID',  // Foreign key on RentalAgreement
+            'userID',  // Foreign key on User (this should be ownerID, not userID)
+            'rentalAgreementID',  // Local key on Payment
+            'ownerID'  // Local key on RentalAgreement (this should be ownerID)
         );
     }
+
     public function negotiation()
     {
-        return $this->belongsTo(Negotiation::class, 'rentalAgreementID', 'listingID'); // Assuming rentalAgreementID relates to the listingID in Negotiation
+        return $this->belongsTo(Negotiation::class, 'rentalAgreementID', 'listingID');
     }
 
-    public function billing() {
+    public function billing()
+    {
         return $this->hasOne(BillingDetail::class, 'rental_agreement_id', 'rentalAgreementID');
     }
+
     public function meetupProof()
     {
         return $this->hasOne(MeetupProof::class, 'rental_agreement_id', 'rentalAgreementID');

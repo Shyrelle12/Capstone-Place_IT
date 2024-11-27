@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
         if ($user->isVerified === 0) {
             // Redirect to the OTP verification page if not verified
-            return redirect()->route('otp.verify')->with('status', 'Please check your email for the OTP.');
+            return redirect()->route('otp.verify');
         }
 
         // Set session flag for showing welcome modal
