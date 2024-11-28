@@ -78,10 +78,10 @@
                             <tbody>
                                 @foreach($allListings as $listing)
                                     <tr>
-                                        <td class="border px-6 py-3">{{ $listing->title }}</td>
-                                        <td class="border px-6 py-3">{{ $listing->location }}</td>
-                                        <td class="border px-6 py-3">{{ $listing->owner->firstName }} {{ $listing->owner->lastName }}</td>
-                                        <td class="border px-6 py-3">
+                                        <td class="text-center border px-6 py-3">{{ $listing->title }}</td>
+                                        <td class="text-center border px-6 py-3">{{ $listing->location }}</td>
+                                        <td class="text-center border px-6 py-3">{{ $listing->owner->firstName }} {{ $listing->owner->lastName }}</td>
+                                        <td class="text-center border px-6 py-3">
                                             <span class="
                                                 {{ $listing->status === 'Pending' ? 'text-gray-600' : '' }}
                                                 {{ $listing->status === 'Disapproved' ? 'text-red-600' : '' }}

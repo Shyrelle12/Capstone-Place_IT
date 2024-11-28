@@ -7,6 +7,9 @@ use App\Models\ListingImages;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\Payment;
+use App\Models\Negotiation;
+use App\Models\SystemFeedback;
+use App\Models\Reviews;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -327,5 +330,52 @@ class AdminController extends Controller
 
         $users = User::where('role', $role)->get(['userID', 'firstName', 'lastName']);
         return response()->json($users);
+    }
+    public function showReports() 
+    {
+        // Get the required data
+        $approvedNegotiations = Negotiation::where('negoStatus', 'approved')->count();
+        $pendingNegotiations = Negotiation::where('negoStatus', 'pending')->count();
+        $totalNegotiations = Negotiation::count();
+        $systemFeedbacks = SystemFeedback::count();
+        $reviews = Reviews::count();
+        $paymentHistory = Payment::count();
+        
+        // Calculate Total Earnings (sum of offerAmount - 10%)
+        $totalEarnings = Negotiation::where('negoStatus', 'approved')
+        ->sum(Negotiation::raw('offerAmount * 0.10'));
+
+        return view('admin.reports', compact(
+            'approvedNegotiations', 
+            'pendingNegotiations', 
+            'totalNegotiations', 
+            'systemFeedbacks', 
+            'reviews', 
+            'paymentHistory', 
+            'totalEarnings'
+        ));
+    }
+    public function negotiationReport()
+    {
+        $negotiations = Negotiation::all(); // Retrieve all negotiations (replace with your data)
+        return view('admin.negotiations', compact('negotiations'));
+    }
+
+    public function systemFeedbackReport()
+    {
+        $feedbacks = SystemFeedback::all(); // Retrieve all system feedbacks (replace with your data)
+        return view('admin.system_feedback', compact('feedbacks'));
+    }
+
+    public function reviewsReport()
+    {
+        $reviews = Reviews::all(); // Retrieve all reviews (replace with your data)
+        return view('admin.reviews', compact('reviews'));
+    }
+
+    public function paymentHistoryReport()
+    {
+        $payments = Payment::all(); // Retrieve all payment history (replace with your data)
+        return view('admin.payment_report', compact('payments'));
     }
 }

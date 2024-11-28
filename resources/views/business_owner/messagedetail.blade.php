@@ -29,7 +29,7 @@
                                 </span>
                             </a>
                             <span class="font-semibold p-4 text-lg sm:text-xl">
-                                {{ ucwords($negotiation->reciever->firstName) }} {{ ucwords($negotiation->reciever->lastName) }}
+                                {{ ucwords($negotiation->receiver->firstName) }} {{ ucwords($negotiation->receiver->lastName) }}
                             </span>
                         </div>
                     </div>
@@ -97,9 +97,12 @@
                             @method('PUT')
                                 <h4 class="text-lg font-semibold pl-2">Amount Offered</h4>  
                                 <input name="offerAmount" class="pl-7 text-2xl bg-gray-100 rounded-md w-full sm:w-40 font-bold" value="{{ number_format($negotiation->offerAmount, 2) }}" required>
-                                <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                    Update Offer
-                                </button>
+                                @if(!isset($negotiation->rentalAgreement) || $negotiation->rentalAgreement->status !== 'approved')
+                                    <button type="submit" 
+                                            class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                        Update Offer
+                                    </button>
+                                @endif
                             </form>
                             </div>
                             <div class="w-1/2 text-right mt-4 md:mt-0">
@@ -209,42 +212,8 @@
                                 Proceed to Payment
                             </a>
                         @endif
-                    @else <!-- Form Section for Rental Term, Start Date, End Date -->
-                                <form action="{{ route('negotiation.rentAgree', ['negotiationID' => $negotiation->negotiationID]) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="ownerID" value="{{ $negotiation->listing->ownerID }}">
-                                    <input type="hidden" name="renterID" value="{{ $negotiation->senderID }}">
-                                    <input type="hidden" name="listingID" value="{{ $negotiation->listingID }}">
-
-                                    <!-- Rental Term -->
-                                    <div class="flex flex-col">
-                                        <label for="rentalTerm" class="block font-semibold text-gray-700">Rental Term:</label>
-                                        <select class="p-2 border border-gray-300 rounded-lg" name="rentalTerm" id="rentalTerm" required>
-                                            <option value="">Choose...</option>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                            <option value="yearly">Yearly</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Start Date -->
-                                    <div class="flex flex-col mt-2">
-                                        <label for="startDate" class="block mb-2 font-semibold text-gray-700">Start Date:</label>
-                                        <input type="date" name="startDate" id="startDate" class="p-2 border border-gray-300 rounded-lg" required>
-                                    </div>
-
-                                    <!-- End Date -->
-                                    <div class="flex flex-col mt-2">
-                                        <label for="endDate" class="block mb-2 font-semibold text-gray-700">End Date:</label>
-                                        <input type="date" name="endDate" id="endDate" class="mb-2 p-2 border border-gray-300 rounded-lg" required>
-                                    </div>
-
-                                    <!-- Hidden Fields for offerAmount -->
-                                    <input type="hidden" name="offerAmount" value="{{ $negotiation->offerAmount }}">
-
-                                    <!-- Submit Button -->
-                                    <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 w-full">Submit</button>
-                                </form>
+                    @else 
+                        <p>No agreement submitted.</p>
                     @endif
                 </div>
             </div>
@@ -416,7 +385,7 @@
     });
 </script>
     <!-- Image Modal -->
-    <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-75 items-center justify-center">
+    <div id="imageModal" class="fixed flex inset-0 z-50 hidden bg-black bg-opacity-75 items-center justify-center">
         <div class="relative max-w-full max-h-full">
             <!-- Close Button with Circular Gray Background -->
             <button onclick="closeModal()" 

@@ -11,6 +11,9 @@ use App\Models\Notification;
 use App\Models\Payment;
 use App\Models\Listing;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\RentalAgreementMailable;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 
 class NegotiationController extends Controller
 {
@@ -215,25 +218,46 @@ class NegotiationController extends Controller
         $request->validate([
             'listingID' => 'required|exists:listing,listingID',
             'receiverID' => 'required|exists:users,userID',
-            'offerAmount' => 'required|numeric',
+            'offerAmount' => 'required|numeric|min:1',
+            'rentalTerm' => 'required|string|in:weekly,monthly,yearly',
+            'startDate' => 'required|date|after_or_equal:today',
+            'endDate' => 'required|date|after:startDate',
         ]);
 
-        $negotiation = Negotiation::create([
-            'listingID' => $request->listingID,
-            'senderID' => Auth::id(),
-            'receiverID' => $request->receiverID, 
-            'negoStatus' => 'Pending',
-            'offerAmount' => $request->offerAmount,
-        ]);
+        try {
+            // Create a negotiation entry
+            $negotiation = Negotiation::create([
+                'listingID' => $request->listingID,
+                'senderID' => Auth::id(),
+                'receiverID' => $request->receiverID,
+                'negoStatus' => 'Pending',
+                'offerAmount' => $request->offerAmount,
+            ]);
 
-        Notification::create([
-            'n_userID' => $request->receiverID,  // Notify the space owner (receiver)
-            'type' => 'negotiation',  // You can define this type for negotiation
-            'data' => $negotiation->listing->title, // Custom message
-            'created_at' => now(),
-        ]);
+            // Create a rental agreement tied to this negotiation
+            RentalAgreement::create([
+                'listingID' => $request->listingID,
+                'ownerID' => $request->receiverID,
+                'renterID' => Auth::id(),
+                'rentalTerm' => $request->rentalTerm,
+                'offerAmount' => $request->offerAmount,
+                'dateStart' => $request->startDate,
+                'dateEnd' => $request->endDate,
+                'status' => 'Pending',
+                'isPaid' => false,
+            ]);
 
-        return redirect()->route('business.negotiations')->with('success', 'Your offer has been sent successfully, and the space owner has been notified.');
+            Notification::create([
+                'n_userID' => $request->receiverID,  // Notify the space owner (receiver)
+                'type' => 'negotiation',  // You can define this type for negotiation
+                'data' => $negotiation->listing->title, // Custom message
+                'created_at' => now(),
+            ]);
+
+            return redirect()->route('business.negotiations')->with('success', 'Negotiation request sent successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred while processing your request.');
+        }
     }
     public function storeDB(Request $request, $negotiationID)
     {
@@ -337,7 +361,7 @@ class NegotiationController extends Controller
     {
         // Find the rental agreement by its ID
         $rentalAgreement = RentalAgreement::where('rentalAgreementID', $rentalAgreementID)
-                                        ->firstOrFail();
+                                            ->firstOrFail();
 
         // Check if it's already approved
         if ($rentalAgreement->status === 'approved') {
@@ -349,7 +373,35 @@ class NegotiationController extends Controller
         $this->notifyBusinessOwnerAgreement($rentalAgreement);
         $rentalAgreement->save();
 
-        return redirect()->back()->with('success', 'Rental Agreement approved successfully.');
+        // Fetch negotiation details
+        $negotiation = $rentalAgreement->negotiationMail; // Assuming RentalAgreement is related to Negotiation
+        $listing = $negotiation->listing; // Assuming Negotiation is related to Listing
+        $renter = $negotiation->sender; // Assuming Negotiation is related to Renter
+        $spaceOwner = $listing->owner; // Assuming Listing is related to Space Owner
+
+        // Prepare data for the email
+        $agreementData = [
+            'negotiationID' => $negotiation->negotiationID,
+            'renter' => $renter->firstName . ' ' . $renter->lastName,
+            'spaceOwner' => $spaceOwner->firstName . ' ' . $spaceOwner->lastName,
+            'listingName' => $listing->title,
+            'rentalTerm' => $rentalAgreement->rentalTerm,
+            'startDate' => $rentalAgreement->dateStart,
+            'endDate' => $rentalAgreement->dateEnd,
+            'status' => $rentalAgreement->status,
+            'offerAmount' => $rentalAgreement->offerAmount,
+            'dateCreated' => $rentalAgreement->created_at->format('Y-m-d'),
+        ];
+
+        $pdf = Pdf::loadView('emails.rental_agreements', compact('agreementData'));
+        $pdfPath = storage_path('app/public/rental_agreements/agreement_' . $rentalAgreementID . '.pdf');
+        $pdf->save($pdfPath);
+
+        // Send email to both users
+        Mail::to($renter->email)->send(new RentalAgreementMailable($agreementData, $pdfPath));
+        Mail::to($spaceOwner->email)->send(new RentalAgreementMailable($agreementData, $pdfPath));
+
+        return redirect()->back()->with('success', 'Rental Agreement approved successfully, and emails sent.');
     }
 
     public function showPaymentDetails(Request $request)
@@ -361,7 +413,9 @@ class NegotiationController extends Controller
             ->get();
 
         // Fetch all payments
-        $payments = Payment::with(['renter', 'listing', 'rentalAgreement', 'spaceOwner'])->get();
+        $payments = Payment::whereIn('rentalAgreementID', $negotiations->pluck('negotiationID'))
+        ->with(['renter', 'listing', 'rentalAgreement', 'spaceOwner'])
+        ->get();
 
         // Fetch all billing details for the authenticated user
         $billingDetails = BillingDetail::where('user_id', Auth::id())
@@ -425,5 +479,32 @@ class NegotiationController extends Controller
         }
 
         return back()->with('error', 'Unable to approve payment.');
+    }
+
+    public function downloadReceipt($paymentID)
+    {
+        $payment = Payment::findOrFail($paymentID);
+        $negotiation = Negotiation::findOrFail($payment->rentalAgreementID);
+
+        // Prepare data for the receipt
+        $data = [
+            'payer' => $negotiation->sender->firstName . ' ' . $negotiation->sender->lastName,
+            'payerAddress' => $negotiation->sender->email ?? 'N/A',
+            'payee' => $negotiation->receiver->firstName . ' ' . $negotiation->receiver->lastName,
+            'payeeAddress' => $negotiation->receiver->email ?? 'N/A',
+            'amount' => $payment->amount,
+            'purpose' => $negotiation->listing->title,
+            'receiptNumber' => $payment->billing->gcash_number,
+            'mobileNumber' => $payment->renter->mobileNumber,
+            'status' => $payment->status,
+            'negostatus' => $negotiation->negoStatus,
+            'date' => $payment->date,
+        ];
+
+        // Load view and generate PDF
+        $pdf = PDF::loadView('emails.receipts', $data);
+
+        // Return the PDF for download
+        return $pdf->download('Payment_Receipt_' . $payment->paymentID . '.pdf');
     }
 }

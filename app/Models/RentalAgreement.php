@@ -56,6 +56,10 @@ class RentalAgreement extends Model
     {
         return $this->belongsTo(Negotiation::class, 'negotiationID');
     }
+    public function negotiationMail()
+    {
+        return $this->hasOne(Negotiation::class, 'listingID', 'listingID');
+    }
     public function payments() {
         return $this->hasMany(Payment::class, 'rentalAgreementID', 'rentalAgreementID');
     }

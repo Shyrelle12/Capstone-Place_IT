@@ -121,19 +121,43 @@
             @else
                 <h2 class="text-lg font-semibold mb-2">Negotiate for {{ $listing->title }}</h2>
                 <form action="{{ route('negotiation.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="listingID" value="{{ $listing->listingID }}">
-                <input type="hidden" name="receiverID" value="{{ $listing->owner->userID }}">
-                <!-- Offer Amount -->
-                <div class="mb-4">
-                    <label class="block text-gray-700">Offer Amount</label>
-                    <input type="text" name="offerAmount" placeholder="e.g. ₱000.00" class="w-full p-3 border rounded-md" required>
-                </div>
+                    @csrf
+                    <input type="hidden" name="listingID" value="{{ $listing->listingID }}">
+                    <input type="hidden" name="receiverID" value="{{ $listing->owner->userID }}">
+                                        
 
-                <!-- Submit Button -->
-                <div class="text-center">
-                    <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded-full hover:bg-green-700">Send Offer</button>
-                </div>
+                                        <!-- Rental Term -->
+                                        <div class="flex flex-col">
+                                            <label for="rentalTerm" class="block font-semibold text-gray-700">Rental Term:</label>
+                                            <select class="p-2 border border-gray-300 rounded-lg" name="rentalTerm" id="rentalTerm" required>
+                                                <option value="">Choose...</option>
+                                                <option value="weekly">Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                                <option value="yearly">Yearly</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Start Date -->
+                                        <div class="flex flex-col mt-2">
+                                            <label for="startDate" class="block mb-2 font-semibold text-gray-700">Start Date:</label>
+                                            <input type="date" name="startDate" id="startDate" class="p-2 border border-gray-300 rounded-lg" required>
+                                        </div>
+
+                                        <!-- End Date -->
+                                        <div class="flex flex-col mt-2">
+                                            <label for="endDate" class="block mb-2 font-semibold text-gray-700">End Date:</label>
+                                            <input type="date" name="endDate" id="endDate" class="mb-2 p-2 border border-gray-300 rounded-lg" required>
+                                        </div>
+                    <!-- Offer Amount -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Offer Amount</label>
+                        <input type="text" name="offerAmount" placeholder="e.g. ₱000.00" class="w-full p-3 border rounded-md" required>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="bg-green-600 text-white py-2 px-4 rounded-full hover:bg-green-700">Send Offer</button>
+                    </div>
             </form>
             @endif
         </div>

@@ -88,6 +88,13 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('/admin/listingmanagement/approve-listing/{listingID}', [AdminController::class, 'approveListing'])->name('admin.approveListing');
     Route::post('/admin/listingmanagement/disapprove-listing/{listingID}', [AdminController::class, 'disapproveListing'])->name('admin.disapproveListing');
     Route::get('/admin/listingmanagement/view/{listingID}', [AdminController::class, 'viewListing'])->name('admin.viewListing');
+    Route::get('/admin/reports', [AdminController::class, 'showReports'])->name('admin.reports.dashboard');
+    Route::get('/admin/reports/transactions', [AdminController::class, 'transactionReport'])->name('admin.transaction');
+    Route::get('/admin/reports/listings', [AdminController::class, 'listingReport'])->name('admin.listings');
+    Route::get('/admin/reports/negotiations', [AdminController::class, 'negotiationReport'])->name('admin.negotiations');
+    Route::get('/admin/reports/feedbacks', [AdminController::class, 'systemFeedbackReport'])->name('admin.feedbacks');
+    Route::get('/admin/reports/reviews', [AdminController::class, 'reviewsReport'])->name('admin.reviews');
+    Route::get('/admin/reports/payments', [AdminController::class, 'paymentHistoryReport'])->name('admin.payments');
 });
 
 // Admin Payments
@@ -140,6 +147,7 @@ Route::middleware(['auth', 'verified', 'role:space_owner'])->group(function () {
     Route::get('/space/reviews', [SystemFeedbackController::class, 'index'])->name('space.reviews');
     Route::post('/space/reviews/submit', [SystemFeedbackController::class, 'store'])->name('space.submit');
     Route::get('/space/payment', [NegotiationController::class, 'showPaymentDetails'])->name('space.business_details');
+    Route::get('/space/payment/download/{paymentID}', [NegotiationController::class, 'downloadReceipt'])->name('payment.download');
     Route::put('/space/payment/{payment}/approve', [NegotiationController::class, 'approve'])->name('payments.approve');
     Route::post('space/rentalagreement/{rentalAgreementID}/approve', [NegotiationController::class, 'approveRentalAgreement'])->name('rentalagreement.approve');
     Route::post('/space/negotiations/{negotiationID}/reply', [App\Http\Controllers\NegotiationController::class, 'reply'])->name(name: 'negotiation.reply');
