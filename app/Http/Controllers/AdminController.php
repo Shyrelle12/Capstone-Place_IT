@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Models\Payment;
 use App\Models\Negotiation;
 use App\Models\SystemFeedback;
+use App\Models\RentalAgreement;
 use App\Models\Reviews;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -130,36 +131,51 @@ class AdminController extends Controller
 
     public function updatePaymentStatus(Request $request, $paymentID)
     {
-        // Find the payment by ID
-        $payment = Payment::find($paymentID);
+        $payment = Payment::findOrFail($paymentID);
+        $newStatus = $request->input('status');
 
-        if (!$payment) {
-            return redirect()->back()->with('error', 'Payment not found.');
-        }
-        
-        // Update the status based on form input
-        $payment->status = $request->input('status');
-        
-        // Save the updated payment
-        $payment->save();
+        // Handling payment status transitions
+        if ($newStatus === 'confirmed' && $payment->status === 'pending') {
+            $payment->status = 'confirmed';
 
-        if ($payment->status === 'confirmed') {
-            // Find the related RentalAgreement
-            $rentalAgreement = $payment->rentalAgreement;
-    
+            // Update the isPaid field in the related rental agreement
+            $rentalAgreement = RentalAgreement::where('rentalAgreementID', $payment->rentalAgreementID)->first();
             if ($rentalAgreement) {
-                // Update the isPaid field to true (1)
-                $rentalAgreement->isPaid = true; // Or $rentalAgreement->isPaid = 1;
+                $rentalAgreement->isPaid = true;
                 $rentalAgreement->save();
             }
+        } elseif ($newStatus === 'partial_payment' && $payment->status === 'confirmed') {
+            $payment->status = 'partial_payment';
+        } elseif ($newStatus === 'transferred' && $payment->status === 'partial_payment') {
+            $payment->status = 'transferred';
+        } elseif ($newStatus === 'received' && $payment->status === 'transferred') {
+            $payment->status = 'received';
         }
-        
-        $this->notifyOwnerPayment($payment);
-        $this->notifyBusinessOwnerPayment($payment);
 
-        return redirect()->back()->with('success', 'Payment status updated successfully!');
+        $payment->save();
+
+        return redirect()->route('admin.payment')->with('success', 'Payment status updated successfully!');
     }
+
     public function transfer(Request $request)
+    {
+        // Find the payment by ID
+        $payment = Payment::find($request->paymentID);
+
+        // Handle the proof of payment file upload
+        if ($request->hasFile('proof')) {
+            $filePath = $request->file('proof')->store('payments', 'public');
+            $payment->admin_proof = $filePath; // Save proof uploaded by admin
+        }
+
+        $payment->status = 'Partial Payment';  // Update status to transferred
+        $payment->save();
+        $this->notifyOwnerSentPayment($payment);
+        
+
+        return redirect()->back()->with('success', 'Payment transferred successfully!');
+    }
+    public function transferFull(Request $request)
     {
         // Find the payment by ID
         $payment = Payment::find($request->paymentID);

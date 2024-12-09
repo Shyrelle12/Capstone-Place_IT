@@ -1,5 +1,10 @@
 <title>Business Owner Dashboard</title>
 <x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('List Spaces Available') }}
+        </h2>
+    </x-slot>
     <div class="flex flex-col h-screen">
         <!-- Main content area -->
         <div class="flex-grow py-6">

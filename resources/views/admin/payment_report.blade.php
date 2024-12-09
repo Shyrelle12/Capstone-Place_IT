@@ -1,4 +1,4 @@
-
+<title>Payment Reports</title>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Reviews Section -->
             <div class="bg-white shadow-lg sm:rounded-lg p-6">
-                <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Customer Reviews</h2>
+                <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Customer Payments</h2>
 
                 <!-- Reviews Table -->
                 <div class="overflow-x-auto rounded-lg shadow-sm">
@@ -31,7 +31,7 @@
                             <td class="px-6 py-3 text-sm">₱{{ number_format($payment->amount, 2) }}</td>
                             <td class="px-6 py-3 text-sm capitalize">
                                 <span class="inline-block py-1 px-3 rounded-full text-white 
-                                    {{ $payment->status == 'paid' ? 'bg-green-500' : 'bg-yellow-500' }}">
+                                    {{ $payment->status == 'received' ? 'bg-green-500' : 'bg-yellow-500' }}">
                                     {{ ucfirst($payment->status) }}
                                 </span>
                             </td>

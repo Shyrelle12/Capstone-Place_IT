@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Negotiation;
 use App\Models\Reply;
@@ -219,9 +220,10 @@ class NegotiationController extends Controller
             'listingID' => 'required|exists:listing,listingID',
             'receiverID' => 'required|exists:users,userID',
             'offerAmount' => 'required|numeric|min:1',
-            'rentalTerm' => 'required|string|in:weekly,monthly,yearly',
+            'rentalTerm' => 'required|string|in:1 Week,2 Weeks,3 Weeks,monthly',
             'startDate' => 'required|date|after_or_equal:today',
             'endDate' => 'required|date|after:startDate',
+            'visit_date' => 'required|date|after_or_equal:today',
         ]);
 
         try {
@@ -232,6 +234,8 @@ class NegotiationController extends Controller
                 'receiverID' => $request->receiverID,
                 'negoStatus' => 'Pending',
                 'offerAmount' => $request->offerAmount,
+                'visit_date' => $request->visit_date,
+                'visitStatus' => 'Pending'
             ]);
 
             // Create a rental agreement tied to this negotiation
@@ -386,11 +390,14 @@ class NegotiationController extends Controller
             'spaceOwner' => $spaceOwner->firstName . ' ' . $spaceOwner->lastName,
             'listingName' => $listing->title,
             'rentalTerm' => $rentalAgreement->rentalTerm,
-            'startDate' => $rentalAgreement->dateStart,
-            'endDate' => $rentalAgreement->dateEnd,
+            'startDate' => $rentalAgreement->dateStart->format('F j, Y'),
+            'endDate' => $rentalAgreement->dateEnd->format('F j, Y'),
             'status' => $rentalAgreement->status,
             'offerAmount' => $rentalAgreement->offerAmount,
-            'dateCreated' => $rentalAgreement->created_at->format('Y-m-d'),
+            'dateCreated' => $rentalAgreement->created_at->format('F j, Y'),
+            'visit_date' => $negotiation->visit_date 
+                ? $negotiation->visit_date->format('F j, Y') 
+                : 'N/A',
         ];
 
         $pdf = Pdf::loadView('emails.rental_agreements', compact('agreementData'));
@@ -499,6 +506,8 @@ class NegotiationController extends Controller
             'status' => $payment->status,
             'negostatus' => $negotiation->negoStatus,
             'date' => $payment->date,
+            'dategen' => now()->format('Y-m-d H:i:s'),
+            'uniqueKey' => Str::uuid(),
         ];
 
         // Load view and generate PDF

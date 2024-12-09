@@ -73,7 +73,7 @@
                                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                                         <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Proof of Payment</th>
                                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
-                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Download Receipt</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Download Invoice</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm text-gray-700">
@@ -109,7 +109,9 @@
                                                 @elseif($payment && $payment->status == 'confirmed')
                                                     <p class="text-gray-600 italic">Submit proof of meetup, and wait for confirmation.</p>
                                                 @elseif($payment && $payment->status == 'pending')
-                                                    <p class="text-gray-600 italic">Payment not yet confirmed.</p>    
+                                                    <p class="text-gray-600 italic">Payment not yet confirmed.</p>
+                                                @elseif($payment && $payment->status == 'partial_payment')
+                                                    <p class="text-gray-600 italic">Remaining payment will be sent after transaction.</p>    
                                                 @else
                                                     <p class="text-gray-600 italic">Payment received.</p>
                                                 @endif
@@ -117,7 +119,7 @@
                                             <td class="px-6 py-4 text-left">
                                                 @if($payment && $payment->status == 'received')
                                                     <a href="{{ route('payment.download', $payment->paymentID) }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-all duration-200 inline-block text-center">
-                                                        Download Receipt
+                                                        Download Invoice
                                                     </a>
                                                 @else
                                                     <p class="text-gray-600 italic">No receipt available.</p>

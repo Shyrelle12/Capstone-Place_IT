@@ -104,6 +104,7 @@ Route::get('/admin/payment', [AdminController::class, 'payment'])
 
 Route::put('/admin/payments/{paymentID}', [AdminController::class, 'updatePaymentStatus'])->name('admin.payments.update');
 Route::post('/admin/payments/transfer', [AdminController::class, 'transfer'])->name('admin.payments.transfer');
+Route::post('/admin/payments/transfer-full', [AdminController::class, 'transferFull'])->name('admin.payments.full');
 
 
 
@@ -130,6 +131,7 @@ Route::middleware(['auth', 'verified', 'role:business_owner'])->group(function (
     Route::put('/business/negotiations/{negotiationID}/{rentalAgreementID}/update', [App\Http\Controllers\NegotiationController::class, 'update'])->name('rentalagreement.update');
     Route::post('/business/negotiations/{negotiationID}/rent-agreement', [App\Http\Controllers\NegotiationController::class, 'rentAgree'])->name('negotiation.rentAgree');
     Route::post('/business/negotiations/store', [App\Http\Controllers\NegotiationController::class, 'store'])->name('negotiation.store');
+    Route::get('/business/reports', [BusinessOwnerController::class, 'reports'])->name('business.reports');
 });
 
 // Space Owner Routes
@@ -155,6 +157,7 @@ Route::middleware(['auth', 'verified', 'role:space_owner'])->group(function () {
     Route::post('/space/negotiations/{negotiationID}/billingStore', [NegotiationController::class, 'storeDB'])->name('billing.store');
     Route::post('/space/negotiations/{negotiationID}/meetup_store', [SpaceOwnerController::class, 'storeProofOfMeetup'])->name('meetup.store');
     Route::post('/space/negotiations/{negotiationID}/updateStatus', [App\Http\Controllers\NegotiationController::class, 'updateStatus'])->name('negotiation.updateStatus');
+    Route::get('/space/reports', [SpaceOwnerController::class, 'reports'])->name('space.reports');
 });
 
 Route::post('/terms/accept', [UserController::class, 'acceptTerms'])->name('terms.accept');

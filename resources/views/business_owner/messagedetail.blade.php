@@ -106,7 +106,7 @@
                             </form>
                             </div>
                             <div class="w-1/2 text-right mt-4 md:mt-0">
-                                <h4 class="text-lg font-semibold -mt-16 pr-4">Status</h4>
+                                <h4 class="text-lg font-semibold -mt-10 pr-4">Status</h4>
                                 <span class="
                                     {{ $negotiation->negoStatus === 'Approved' ? 'text-xl font-bold text-green-600' : '' }}
                                     {{ $negotiation->negoStatus === 'Pending' ? 'text-xl font-bold text-blue-600' : '' }}
@@ -122,6 +122,7 @@
                     @if($rentalAgreement) <!-- Check if rental agreement exists -->
                         <!-- Display the Rental Agreement Details -->
                         <div class="p-4 bg-gray-300 rounded-lg">
+                            <p><strong>Visiting Date:</strong> {{ \Carbon\Carbon::parse($negotiation->visit_date)->format('M d, Y') }}</p>
                             <p><strong>Rental Term:</strong> {{ ucfirst($rentalAgreement->rentalTerm) }}</p>
                             <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($rentalAgreement->dateStart)->format('M d, Y') }}</p>
                             <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($rentalAgreement->dateEnd)->format('M d, Y') }}</p>
@@ -137,28 +138,31 @@
                                 </a>
                             @elseif($rentalAgreement->isPaid)
                                 <!-- Payment Confirmation Message -->
-                                <p class="text-green-600 mt-4">Payment sent, wait for confirmation.</p>
+                                <p class="text-green-600 mt-4 font-semibold text-normal">Your payment has been sent successfully. Please wait for confirmation and further instructions.</p>
                                 <!-- Payment Status Display -->
-                                @if($rentalAgreement->payments->isNotEmpty())
-                                    @foreach($rentalAgreement->payments as $payment)
-                                        <p class="text-gray-600">Payment Status: 
-                                            @if($payment->status == 'pending')
-                                                <span class="text-yellow-500">Pending</span>
-                                            @elseif($payment->status == 'confirmed')
-                                                <span class="text-green-500">Confirmed</span>
-                                            @elseif($payment->status == 'transferred')
-                                                <span class="text-red-500">Sent to Space Owner</span>
-                                            @elseif($payment->status == 'received')
-                                                <span class="text-red-500">Received by Space Owner</span>
-                                            @else
-                                                <span class="text-gray-500">Unknown</span>
-                                            @endif
-                                        </p>
-                                    @endforeach
-                                @else
-                                    <p class="text-red-600">No payments found for this rental agreement.</p>
-                                @endif
-
+                                <div class="mt-6">
+                                    @if($rentalAgreement->payments->isNotEmpty())
+                                        @foreach($rentalAgreement->payments as $payment)
+                                            <div class="bg-gray-100 p-4 mb-4 rounded-lg shadow-sm">
+                                                <p class="text-gray-600 font-medium">Payment Status: 
+                                                    @if($payment->status == 'pending')
+                                                        <span class="text-yellow-500 font-bold">Pending</span>
+                                                    @elseif($payment->status == 'confirmed')
+                                                        <span class="text-green-500 font-bold">Confirmed</span>
+                                                    @elseif($payment->status == 'transferred')
+                                                        <span class="text-red-500 font-bold">Sent to Space Owner</span>
+                                                    @elseif($payment->status == 'received')
+                                                        <span class="text-blue-500 font-bold">Received by Space Owner</span>
+                                                    @else
+                                                        <span class="text-gray-500">Unknown</span>
+                                                    @endif
+                                                </p>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p class="text-red-600 bg-red-100 p-4 rounded-lg shadow-sm">No payments found for this rental agreement.</p>
+                                    @endif
+                                </div>
                             @else <!-- Check if rental agreement was submitted -->
                                 <!-- Allow Business Owner to Edit if not confirmed -->
                                 <button id="editModalButton" data-id="{{ $rentalAgreement->rentalAgreementID }}" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">

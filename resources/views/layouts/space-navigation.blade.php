@@ -22,6 +22,9 @@
                     <x-nav-link :href="route('space.business_details')"  class="ajax-link" :active="request()->routeIs('space.business_details')">
                         {{ __('Payment') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('space.reports')"  class="ajax-link" :active="request()->routeIs('space.reports')">
+                        {{ __('Reports') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -111,6 +114,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('space.business_details')" :active="request()->routeIs('space.business_details')">
                 {{ __('Payment') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('space.reports')" :active="request()->routeIs('space.business_details')">
+                {{ __('Reports') }}
             </x-responsive-nav-link>
         </div>
         

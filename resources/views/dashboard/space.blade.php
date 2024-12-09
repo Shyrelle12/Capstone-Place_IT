@@ -67,7 +67,7 @@
                                     <h3 class="text-xl font-bold text-black listing-title">{{ $listing->title }}</h3>
                                     <p class="text-sm text-gray-800 listing-location">{{ $listing->location }}</p>
                                     <p class="text-sm text-gray-800 listing-description mt-1">{{ $listing->description }}</p>
-                                    <p class="text-sm text-gray-800 mt-1">Listed on {{ $listing->dateCreated->format('Y-m-d') }}</p>
+                                    <p class="text-sm text-gray-800 mt-1">Listed on {{ $listing->dateCreated->format('F j, Y') }}</p>
                                     <p class="mt-2 font-semibold text-sm 
                                         {{ $listing->status === 'Vacant' ? 'text-green-500' : '' }}
                                         {{ $listing->status === 'Pending' ? 'text-gray-400' : '' }}
@@ -91,13 +91,14 @@
                                         Restore
                                     </button>
                                 </form>
+                                @elseif ($listing->status === 'Vacant')
+                                    <form action="{{ route('listings.destroy', ['listingID' => $listing->listingID]) }}" method="POST" class="inline-block" id="deactivate-form-{{ $listing->listingID }}">
+                                        @csrf
+                                        <button type="button" class="bg-red-700 text-white px-4 py-2 w-40 rounded-lg hover:bg-red-500 text-center" onclick="confirmDeactivation('{{ $listing->listingID }}', '{{ $listing->title }}')">
+                                            Deactivate
+                                        </button>
+                                    </form>
                                 @else
-                                <form action="{{ route('listings.destroy', ['listingID' => $listing->listingID]) }}" method="POST" class="inline-block" id="deactivate-form-{{ $listing->listingID }}">
-                                    @csrf
-                                    <button type="button" class="bg-red-700 text-white px-4 py-2 w-40 rounded-lg hover:bg-red-500 text-center" onclick="confirmDeactivation('{{ $listing->listingID }}', '{{ $listing->title }}')">
-                                        Deactivate
-                                    </button>
-                                </form>
                                 @endif
                             </div>
 

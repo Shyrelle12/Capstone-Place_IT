@@ -52,6 +52,78 @@
                 <li>Rental amounts and payment schedules</li>
                 <li>Termination and renewal clauses</li>
             </ul>
+            @if($user->role === 'business_owner')
+            <h5 class="mt-4 font-semibold">Refund Policy</h5>
+            <ul class="list-disc pl-5">
+                <li>Refunds are allowed only if a user files a complaint within 7 days after the scheduled booking date.</li>
+                <li>Refunds will not be processed if the user fails to provide valid reasons or evidence to support their complaint.</li>
+            </ul>
+            <p class="mt-4">Investigation Process:</p>
+            <ul class="list-disc pl-5">
+                <li>All complaints will be reviewed by PlaceIt's support team.</li>
+                <li>The investigation may include:
+                    <ul>
+                        <li>Review of submitted evidence (e.g., photos, videos).</li>
+                        <li>Communication with the Space Owner and the user.</li>
+                        <li>Verification of the space's condition or booking status.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="mt-4">Refund Decisions:</p>
+            <ul class="list-disc pl-5">
+                <li>Refunds may be partial or full, depending on the outcome of the investigation.</li>
+                <li>If the complaint is deemed invalid, the user will not receive a refund.</li>
+            </ul>
+            <p class="mt-4">Non-Refundable Situations:</p>
+            <ul class="list-disc pl-5">
+                <li>Failure to use the booking without prior notice or valid reasons.</li>
+                <li>Cancellations made outside the allowable cancellation period.</li>
+            </ul>
+            <h5 class="mt-4 font-semibold">Complaint Policy</h5>
+            <p class="mt-4">Filing Complaints:</p>
+            <ul class="list-disc pl-5">
+                <li>Users can submit complaints via the platform’s dedicated email address, providing:
+                    <ul>
+                        <li>Booking details.</li>
+                        <li>Description of the issue.</li>
+                        <li>Evidence (if applicable).</li>
+                    </ul>
+                </li>
+            </ul>
+            <p class="mt-4">Resolution Timeline:</p>
+            <ul class="list-disc pl-5">
+                <li>PlaceIt will review complaints within 5–10 business days and notify the user of the resolution.
+                </li>
+            </ul>
+            <p class="mt-4">Outcome of Complaints:</p>
+            <ul class="list-disc pl-5">
+                <li>Complaints resulting in approved refunds will follow the Refund Policy.</li>
+                <li>Complaints against Space Owners may result in penalties, account suspension, or removal from the platform.</li>
+            </ul>
+            <p class="mt-4">Final Decision</p>
+            <ul class="list-disc pl-5">
+                <li>PlaceIt's decision on complaints and refunds is final and binding.</li>
+            </ul>
+            @elseif($user->role === 'space_owner')
+            <h5 class="mt-4 font-semibold">Payout Policy for Space Owners</h5>
+            <p>Earnings Hold Period:</p>
+            <ul class="list-disc pl-5">
+                <li>Payments received from Business owners/renter for bookings will be held by PlaceIt until the booking is completed and verified.</li>
+                <li>Verification occurs when the Business owners/renter confirms successful usage of the space or if no complaints are filed within the specified period.</li>
+            </ul>
+            <p class="mt-4">Transfer Schedule:</p>
+            <ul class="list-disc pl-5">
+                <li>Space Owners will receive their earnings (less the commission fee) via Gcash right after you send proof of meetup.</li>
+            </ul>
+            <p class="mt-4">Fees and Deductions:</p>
+            <ul class="list-disc pl-5">
+                <li>PlaceIt reserves the right to deduct additional fees (e.g., penalties for violations) before transferring earnings to the Space Owner.</li>
+            </ul>
+            <p class="mt-4">Disputes:</p>
+            <ul class="list-disc pl-5">
+                <li>In the case of any dispute regarding payments, the decision of PlaceIt's administrative team will be final.</li>
+            </ul>
+            @endif
         </div>
         <div class="px-6 py-4 border-t">
             <button type="button" class="btn btn-primary w-full font-bold bg-blue-500 text-black py-2 rounded hover:bg-blue-600" onclick="acceptTerms()">I Agree the Terms and Conditions</button>

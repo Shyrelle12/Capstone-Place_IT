@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RentalAgreement;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Listing;
@@ -176,5 +177,32 @@ class SpaceOwnerController extends Controller
                 'type' => 'meetup_submitted',  // Notification type
                 ]);
         }   
+    }
+
+    public function reports(Request $request)
+    {
+        $ownerID = Auth::id();
+        $search = $request->input('search'); 
+
+        $agreements = RentalAgreement::where('ownerID', $ownerID)
+            ->with(['renter', 'listing']) 
+            ->when($search, function ($query, $search) {
+                $query->whereHas('listing', function ($q) use ($search) {
+                    $q->where('title', 'like', '%' . $search . '%'); 
+                });
+            })
+            ->get();
+
+        foreach ($agreements as $agreement) {
+            $agreement->amountReceivable = $agreement->offerAmount * 0.9;
+        }
+
+        $totalRevenue = $agreements->where('isPaid', true)->sum('amountReceivable');
+
+        return view('space_owner.reports', [
+            'agreements' => $agreements,
+            'totalRevenue' => $totalRevenue,
+            'search' => $search, 
+        ]);
     }
 }

@@ -58,6 +58,12 @@
                             <p class="text-sm text-gray-700">
                                 <strong>Offer:</strong> ₱{{ number_format($negotiation->offerAmount, 2) }}
                             </p>
+                            <p class="mt-4 font-bold
+                                {{ $negotiation->negoStatus === 'Approved' ? 'text-green-600' : '' }}
+                                {{ $negotiation->negoStatus === 'Pending' ? 'text-blue-600' : '' }}
+                                {{ $negotiation->negoStatus === 'Declined' || $negotiation->negoStatus === 'Another Term' ? 'text-red-600' : '' }}">
+                                {{ $negotiation->negoStatus }}
+                            </p>
                             <p class="text-sm mt-2 text-gray-700">
                                 {{ $negotiation->created_at->format('F j, Y') }}
                             </p>

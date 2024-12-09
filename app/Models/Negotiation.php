@@ -11,8 +11,11 @@ class Negotiation extends Model
 
     protected $table = 'negotiations';
     
-    protected $fillable = ['listingID', 'senderID', 'receiverID', 'offerAmount', 'negoStatus'];
+    protected $fillable = ['listingID', 'senderID', 'receiverID', 'offerAmount', 'negoStatus','visit_date','visitStatus'];
     protected $primaryKey = 'negotiationID';
+    protected $casts = [
+        'visit_date' => 'datetime',
+    ];
 
     public function listing() {
         return $this->belongsTo(Listing::class, 'listingID');
@@ -31,7 +34,7 @@ class Negotiation extends Model
     }
     public function rentalAgreement()
     {
-        return $this->hasOne(RentalAgreement::class, 'listingID', 'listingID');
+        return $this->hasOne(RentalAgreement::class, 'rentalAgreementID', 'negotiationID');
     }
     public function bill() {
         return $this->hasOne(BillingDetail::class, 'rental_agreement_id', 'rentalAgreementID');

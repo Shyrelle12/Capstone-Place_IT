@@ -1,15 +1,15 @@
-<!-- resources/views/admin/feedbacks/index.blade.php -->
+<title>System Feedback</title>
 <x-app-layout>
 <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Negotiations') }}
+            {{ __('System Feedback') }}
         </h2>
     </x-slot>
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Reviews Section -->
             <div class="bg-white shadow-lg sm:rounded-lg p-6">
-                <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Negotiations</h2>
+                <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">System Feedback</h2>
 
         <!-- Negotiations Table -->
         <div class="overflow-x-auto rounded-lg shadow-sm">

@@ -119,10 +119,12 @@
                                 <h4 class="text-lg font-semibold">Rental Agreement</h4>
                                 @if($negotiation->rentalAgreement)
                                     <div class="bg-gray-100 p-6 rounded-lg">
+                                        <p><strong>Visiting Date:</strong> {{ \Carbon\Carbon::parse($negotiation->visit_date)->format('M d, Y') }}</p>
                                         <p><strong>Rental Term:</strong> {{ ucfirst($negotiation->rentalAgreement->rentalTerm) }}</p>
                                         <p><strong>Offer Amount:</strong> ₱{{ number_format($negotiation->rentalAgreement->offerAmount, 2) }}</p>
                                         <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($rentalAgreement->dateStart)->format('M d, Y') }}</p>
                                         <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($rentalAgreement->dateEnd)->format('M d, Y') }}</p>
+                                        
 
                                         @if($negotiation->rentalAgreement->status !== 'approved')
                                             <!-- Approve Button -->
@@ -134,18 +136,18 @@
                                             </form>
                                         @else
                                             <!-- Guide Message -->
-                                            <p class="text-green-600 font-light mb-2">Rental Agreement has been approved. You may now proceed with the next steps.</p>
-                                            @if(!$billing)  <!-- Check if GCash details have NOT been submitted -->
-                                                <button id="openModalButton" data-offer-amount="{{ $negotiation->offerAmount }}" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 w-full text-center">
-                                                    Click to send GCash details
+                                            <p class="text-green-600 font-semibold mt-2 mb-4">Your Rental Agreement has been approved. You may now proceed with the next steps.</p>
+                                            @if(!$billing) <!-- Check if GCash details have NOT been submitted -->
+                                                <button id="openModalButton" data-offer-amount="{{ $negotiation->offerAmount }}" class="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 w-full text-center transition duration-200 ease-in-out">
+                                                    Send GCash Details
                                                 </button>
-                                            @elseif($billing && !isset($negotiation->meetupProof))  <!-- Check if GCash details were submitted but proof of meetup NOT uploaded -->
-                                                <p class="text-blue-600 font-light mb-2">GCash details submitted. Please send proof of meetup.</p>
-                                                <button id="openProofButton" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 w-full text-center">
-                                                    Click to send proof of meetup
+                                            @elseif($billing && !isset($negotiation->meetupProof)) <!-- Check if GCash details were submitted but proof of meetup NOT uploaded -->
+                                                <p class="text-blue-600 font-light mb-4">Your GCash details have been submitted. Please upload the proof of meetup to proceed.</p>
+                                                <button id="openProofButton" class="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 w-full text-center transition duration-200 ease-in-out">
+                                                    Upload Proof of Meetup
                                                 </button>
-                                            @elseif(isset($negotiation->meetupProof))  <!-- Check if proof of meetup has been uploaded -->
-                                                <p class="text-blue-600 font-light mb-2">Proof of meetup was sent/uploaded. Wait for confirmation of the admin.</p>
+                                            @elseif(isset($negotiation->meetupProof)) <!-- Check if proof of meetup has been uploaded -->
+                                                <p class="text-blue-600 font-semibold mb-4">Proof of meetup has been uploaded. Please wait for admin confirmation.</p>
                                             @endif
                                         @endif
                                     </div>
@@ -172,58 +174,60 @@
                                     </form>
                                 @else
                                     <!-- Placeholder message guiding the user -->
-                                    <p class="text-gray-600 text-sm mb-2">Complete the approval, GCash details, and meetup proof steps to enable negotiation status update.</p>
+                                    <p class="text-gray-600 text-sm mb-4">Complete the approval, GCash details submission, and meetup proof upload to proceed with the negotiation status update.</p>
                                 @endif
                             @elseif($negotiation->negoStatus === 'Declined')
-                                <p class="text-red-600 font-light mb-2">
-                                    Negotiation status declined. This space is not available for further transactions. Please contact support for more details.
+                                <p class="text-red-600 font-semibold mb-10">
+                                    The negotiation status has been declined. This space is no longer available for further transactions. 
+                                    <span class="font-light">For more information, please contact support.</span>
                                 </p>
                             @else
                                 <!-- Message displayed after the negotiation status is approved -->
-                                <p class="text-green-600 font-light mb-2 md:mb-9">
-                                    Negotiation status approved. The space is now occupied and cannot be rented by others.
+                                <p class="text-green-600 font-semibold mb-2 md:mb-9">
+                                    The negotiation has been approved. The space is now occupied and is no longer available for rent.
                                 </p>
                               
                             @endif
                         </div>
                         </div>
                         <form id="myForm" action="{{ route('billing.store', ['negotiationID' => $negotiation->negotiationID]) }}" method="POST">
-                        @csrf
-                        <div id="detailsModal" class="fixed inset-0 bg-gray-500 flex bg-opacity-75 items-center justify-center hidden">
-                            <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative">
-                                <button onclick="closeDetailsModal()" 
-                                        class="absolute top-0 right-0 mt-2 mr-2 text-gray-600 text-xl z-10 
-                                            hover:bg-gray-200 rounded-full h-8 w-8 flex items-center justify-center">
-                                    &times;
-                                </button>
-                                <h3 class="text-lg font-semibold mb-4">Send Details</h3>
-                                <div class="mb-4">
-                                    <label for="amountSent" class="block text-sm font-semibold">Amount Sent:</label>
-                                    <input type="text" id="amountSent" name="amountSent" class="form-input mt-1 block w-full" disabled>
+                            @csrf
+                            <div id="detailsModal" class="fixed inset-0 bg-gray-500 flex bg-opacity-75 items-center justify-center hidden">
+                                <div class="bg-white p-5 rounded-lg shadow-lg max-w-sm w-full relative">
+                                    <!-- Close Button -->
+                                    <p class="text-center text-red-600">Click anywhere outside to close</p>
+                                    <h3 class="text-lg font-semibold mb-4">Send Details</h3>
+                                    
+                                    <!-- Form Fields -->
+                                    <div class="mb-4">
+                                        <label for="amountSent" class="block text-sm font-semibold">Amount Sent:</label>
+                                        <input type="text" id="amountSent" name="amountSent" class="form-input mt-1 block w-full" disabled>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="taxPayment" class="block text-sm font-semibold">Commission (10%):</label>
+                                        <input type="text" id="taxPayment" name="taxPayment" class="form-input mt-1 block w-full" disabled>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="total" class="block text-sm font-semibold">Total:</label>
+                                        <input type="text" id="total" name="total" class="form-input mt-1 block w-full" disabled>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="gcashNumber" class="block text-sm font-semibold">Gcash Number:</label>
+                                        <input type="text" id="gcashNumber" name="gcashNumber" class="form-input mt-1 block w-full" placeholder="0911-222-3333" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <h4 class="text-sm font-semibold">Terms and Conditions:</h4>
+                                        <p class="text-xs text-gray-600 mt-2">
+                                            The 10% deduction covers commission fees and associated costs, and the total amount receivable is split into two payments: 50% is paid during the rental term starts as a partial payment, and the remaining 50% is paid after the rental term ends as the final payment.
+                                        </p>
+                                        <input type="checkbox" id="myCheckbox" name="myCheckbox" required>
+                                        <label for="myCheckbox" class="text-sm">I agree to the terms and conditions</label>
+                                    </div>
+                                    
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 w-full">Submit</button>
                                 </div>
-                                <div class="mb-4">
-                                    <label for="taxPayment" class="block text-sm font-semibold">Tax Payment (10%):</label>
-                                    <input type="text" id="taxPayment" name="taxPayment" class="form-input mt-1 block w-full" disabled>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="total" class="block text-sm font-semibold">Total:</label>
-                                    <input type="text" id="total" name="total" class="form-input mt-1 block w-full" disabled>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="gcashNumber" class="block text-sm font-semibold">Gcash Number:</label>
-                                    <input type="text" id="gcashNumber" name="gcashNumber" class="form-input mt-1 block w-full" placeholder="0911-222-3333" required>
-                                </div>
-                                <div class="mb-4">
-                                    <h4 class="text-sm font-semibold">Terms and Conditions:</h4>
-                                    <p class="text-xs text-gray-600 mt-2">
-                                        The 10% tax deduction is applied to cover commission fees and other associated costs. This ensures that the transaction can proceed smoothly and all necessary charges are accounted for. The total amount reflects the final amount after the deduction of these fees.
-                                    </p>
-                                    <input type="checkbox" id="myCheckbox" name="myCheckbox" required>
-                                    <label for="myCheckbox" class="text-sm">I agree to the terms and conditions</label>
-                                </div>
-                                <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 w-full">Submit</button>
                             </div>
-                        </div>
                         </form>
                         <!-- Modal Structure -->
                         <div id="proofModal" class="hidden flex fixed z-50 inset-0 items-center justify-center bg-gray-900 bg-opacity-75">
